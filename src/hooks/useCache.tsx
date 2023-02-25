@@ -1,8 +1,12 @@
-import React, { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CacheContext, ICacheContext } from "../context/CacheContext";
-function useCache(key: string, funct: () => void) {
+function useCache<T>(
+  key: string,
+  funct: () => Promise<T>,
+  defaultValue: any = undefined
+): [data: T, trigger: (fn?: any) => void] {
   const { getCache, triggerCache } = useContext(CacheContext) as ICacheContext;
-  const trigger = (fn: any) => {
+  const trigger = (fn?: any) => {
     if (fn != undefined) {
       triggerCache(key, fn);
       return;
@@ -12,7 +16,15 @@ function useCache(key: string, funct: () => void) {
       return;
     }
   };
-  return [getCache(key, funct), trigger];
+  const [data, setData] = useState<T>(defaultValue);
+  const getData = async () => {
+    const res = await getCache(key, funct);
+    setData(res);
+  };
+  useEffect(() => {
+    getData();
+  }, [key]);
+  return [data, trigger];
 }
 
 export default useCache;

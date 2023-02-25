@@ -8,28 +8,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CacheProvider = exports.CacheContext = void 0;
 const jsx_runtime_1 = require("react/jsx-runtime");
 const react_1 = require("react");
-const react_use_storage_state_1 = __importDefault(require("react-use-storage-state"));
+const useLocalStorage_1 = require("../hooks/useLocalStorage");
 exports.CacheContext = (0, react_1.createContext)({});
 const CacheProvider = ({ children }) => {
-    const [cache, setcache] = (0, react_use_storage_state_1.default)("cache", []);
+    const [cache, setcache] = (0, useLocalStorage_1.useLocalStorage)("cache", []);
     const triggerCache = (id, fn) => __awaiter(void 0, void 0, void 0, function* () {
         if (typeof fn == "function") {
             const data = yield fn();
-            const res = cache.filter((x) => x.id == id);
+            const res = cache.filter((x) => x.id != id);
             res.push({ data, id });
             setcache([...res]);
             return;
         }
         if (typeof fn != "function") {
-            const res = cache.filter((x) => x.id == id);
-            res.push({ fn, id });
+            const res = cache.filter((x) => x.id != id);
+            res.push({ data: fn, id });
             setcache([...res]);
             return;
         }
