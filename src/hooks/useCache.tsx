@@ -1,30 +1,42 @@
-import { useContext, useEffect, useState } from "react";
-import { CacheContext, ICacheContext } from "../context/CacheContext";
-function useCache<T>(
-  key: string,
-  funct: () => Promise<T>,
-  defaultValue: any = undefined
-): [data: T, trigger: (fn?: any) => void] {
-  const { getCache, triggerCache } = useContext(CacheContext) as ICacheContext;
-  const trigger = (fn?: any) => {
-    if (fn != undefined) {
-      triggerCache(key, fn);
-      return;
-    }
-    if (fn == undefined) {
-      triggerCache(key, funct);
-      return;
-    }
-  };
-  const [data, setData] = useState<T>(defaultValue);
-  const getData = async () => {
-    const res = await getCache(key, funct);
-    setData(res);
-  };
-  useEffect(() => {
-    getData();
-  }, [key]);
-  return [data, trigger];
+import { useState, useContext } from "react";
+import CryptoJS from "crypto-js";
+import { CacheContext } from "../context/CacheContext";
+
+interface CacheItem {
+  id: string;
+  data: any;
 }
 
-export default useCache;
+export default function useCache<T>(key: string, defaultValue: T) {
+  const [data, setData] = useState<T>(defaultValue);
+  const { cache, setcache } = useContext(CacheContext) as any;
+
+  const encryptedKey = CryptoJS.AES.encrypt(key, "secret-key").toString();
+
+  const triggerCache = async (value: T) => {
+    const res = cache.filter((x: CacheItem) => x.id !== encryptedKey);
+    const encryptedValue = CryptoJS.AES.encrypt(
+      JSON.stringify(value),
+      "secret-key"
+    ).toString();
+    res.push({ data: encryptedValue, id: encryptedKey });
+    setcache([...res]);
+  };
+
+  const getCache = async () => {
+    const res = cache?.find((x: CacheItem) => x.id === encryptedKey);
+    if (res === undefined) {
+      setData(defaultValue);
+    } else {
+      const decryptedData = CryptoJS.AES.decrypt(
+        res.data,
+        "secret-key"
+      ).toString(CryptoJS.enc.Utf8);
+      setData(JSON.parse(decryptedData));
+    }
+  };
+
+  getCache();
+
+  return [data, triggerCache];
+}

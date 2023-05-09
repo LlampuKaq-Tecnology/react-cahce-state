@@ -1,2 +1,1 @@
-declare function useCache<T>(key: string, funct: () => Promise<T>, defaultValue?: any): [data: T, trigger: (fn?: any) => void];
-export default useCache;
+export default function useCache<T>(key: string, defaultValue: T): (T | ((value: T) => Promise<void>))[];
