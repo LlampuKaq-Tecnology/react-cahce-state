@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { CacheContext, ICacheContext } from "../context/CacheContext";
+import { CacheContext } from "../context/CacheContext";
 function useClearCache() {
   const { setcache } = useContext(CacheContext) as any;
   const clearCache = () => {
