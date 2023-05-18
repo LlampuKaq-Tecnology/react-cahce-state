@@ -6,16 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = require("react");
 const crypto_js_1 = __importDefault(require("crypto-js"));
 const CacheContext_1 = require("../context/CacheContext");
-function useCache(key, defaultValue) {
+function useCache(key, defaultValue = undefined) {
     const [data, setData] = (0, react_1.useState)(defaultValue);
     const { cache, setcache } = (0, react_1.useContext)(CacheContext_1.CacheContext);
     const triggerCache = (value) => {
         const encryptedValue = crypto_js_1.default.AES.encrypt(JSON.stringify(value), "secret-key").toString();
-        setcache((prevCache) => {
-            const res = prevCache === null || prevCache === void 0 ? void 0 : prevCache.filter((x) => x.id !== key);
-            res.push({ data: encryptedValue, id: key });
-            return [...res];
-        });
+        const res = cache === null || cache === void 0 ? void 0 : cache.filter((x) => x.id !== key);
+        res.push({ data: encryptedValue, id: key });
+        setcache([...res]);
         setData(value);
     };
     (0, react_1.useEffect)(() => {

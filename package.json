@@ -1,6 +1,6 @@
 {
   "name": "react-cache-state",
-  "version": "1.7.4",
+  "version": "1.7.9",
   "description": "",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",

@@ -1,1 +1,1 @@
-export default function useCache<T>(key: string, defaultValue: T): [data: T, fn: (data: any) => void];
+export default function useCache<T>(key: string, defaultValue?: T | undefined): [data: T, fn: (data: any) => void];
